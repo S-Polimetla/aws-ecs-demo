@@ -17,7 +17,7 @@ var port = process.env.PORT || servicePort;
 var router = express.Router();
 
 router.get('/', function(req, res) {
-    res.json({ message: `Hello - I'm BLUE` });
+    res.json({ message: `Hello - I'm GREEN` });
 });
 
 // REGISTER OUR ROUTES -------------------------------
