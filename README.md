@@ -1,2 +1,2 @@
 # aws-ecs-demo
-- For Green deployments
+- For Green deployment
