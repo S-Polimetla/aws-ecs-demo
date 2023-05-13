@@ -1,2 +1,2 @@
 # aws-ecs-demo
-- For blue deployments
+- For blue deployment
