@@ -1,8 +1,8 @@
-var express     = require('express');
-var app         = express();
-var bodyParser  = require('body-parser');
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
 
-var servicePort = 8081;
+var servicePort = 80;
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -16,13 +16,16 @@ var port = process.env.PORT || servicePort;
 // =============================================================================
 var router = express.Router();
 
-router.get('/', function(req, res) {
-    res.json({ message: `Hello - I'm BLUE` });
-});
+const now = new Date();
 
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api', router);
+app.use('/', router);
+
+router.get('/', function (req, res) {
+    res.json({
+        message: `Hello - I'm BLUE`, date: now.toString()
+    });
+    console.log(`Request made at ${now.toString()}`);
+});
 
 // START THE SERVER
 // =============================================================================

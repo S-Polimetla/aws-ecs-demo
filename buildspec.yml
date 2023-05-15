@@ -1,18 +1,25 @@
 version: 0.2
 
+env:
+  variables:
+    VERSION: "V1.0.0"
+
 phases:
   pre_build:
     commands:
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) # Account Id is not available as a env variable in CodeBuild
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t tk-container-registry:blue .
-      - docker tag tk-container-registry:blue $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:blue
+      - docker build -t tk-container-registry:$VERSION .
+      - docker tag tk-container-registry:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:$VERSION
+      - docker tag tk-container-registry:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:latest
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:blue
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:$VERSION
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/tk-container-registry:latest

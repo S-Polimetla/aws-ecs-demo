@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to create a multibranch CI system for a GitHub Repo
+
+Parameters:
+
+  RepoName:
+    Type: String
+    Description: The HTTPS clone URL to the Repo    
+
+  ProjectName:
+    Type: String
+    Description: The name of the CodeBuild Project    
+
+Resources:
+
+  CodeBuildCIProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${ProjectName}-ci
+      Source:
+        Type: GITHUB
+        Location: !Ref RepoName
+        BuildSpec: buildspec.yml
+      Artifacts:
+        Type: NO_ARTIFACTS
+      ServiceRole: !GetAtt CodeBuildCIServiceRole.Arn
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        PrivilegedMode: true
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH, PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED           
+            - Type: HEAD_REF # Do not trigger this build for main branch
+              Pattern: ^refs/heads/main
+              ExcludeMatchedPattern: true
+
+  CodeBuildCIServiceRole: # A very basic role. This can be further enhanced
+    Type: AWS::IAM::Role    
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildTrustPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-ci
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-ci:*
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:List*
+                  - ecr:Describe*
+                  - ecr:Get*
+                  - ecr:BatchGetImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:PutImage
+                Resource:
+                  - '*'

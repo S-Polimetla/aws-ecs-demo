@@ -1,8 +1,15 @@
 {
   "name": "node-api",
+  "version": "0.0.1",
+  "repository": "https://github.com/S-Polimetla/aws-ecs-demo",
+  "description": "Demo Express App to deploy on ECS",
+  "author": "S-Polimetla",
   "main": "server.js",
   "dependencies": {
-    "body-parser": "~1.0.1",
-    "express": "~4.0.0"
+      "body-parser": "^1.20.2",
+      "express": "^4.18.2"
+  },
+  "scripts": {
+      "start": "node server.js"
   }
 }
