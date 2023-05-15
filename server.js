@@ -22,7 +22,8 @@ app.use('/', router);
 
 router.get('/', function (req, res) {
     res.json({
-        message: `Hello - I'm BLUE`, date: now.toString()
+        message: `Hello - I'm Version-1.0.0, you can also call me BLUE`,
+        date: now.toString()
     });
     console.log(`Request made at ${now.toString()}`);
 });
